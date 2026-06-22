@@ -6,8 +6,8 @@ const input = { x: 0, y: 0 };
 const WORLD = { w: 0, h: 0 };
 const player = { x: 0, y: 0 };
 const camera = { x: 0, y: 0 };
-const zoom = 2.7;
-const SPEED = 280; // 世界像素/秒
+const zoom = 0.78;        // 全分辨率世界下的屏幕放大倍数（≈ 旧 1843px 世界的 3.0 视感）
+const SPEED = 1400;       // 世界像素/秒（随大世界等比放大）
 const keys = new Set();
 
 function makePlayer() {
@@ -30,15 +30,59 @@ async function main() {
   const world = new Container();
   app.stage.addChild(world);
 
-  const mapTex = await Assets.load('./assets/map.png');
-  const map = new Sprite(mapTex);
-  world.addChild(map);
-  WORLD.w = map.width;
-  WORLD.h = map.height;
+  // 地图元数据：世界尺寸取全分辨率原图尺寸
+  const metaRes = await fetch('./assets/tiles/meta.json');
+  if (!metaRes.ok) throw new Error('meta.json ' + metaRes.status);
+  const meta = await metaRes.json();
+  WORLD.w = meta.W;
+  WORLD.h = meta.H;
+  const T = meta.tile;
+
+  // 低清底图：秒开、永不空白，拉伸铺满世界，作为高清瓦片的兜底
+  const baseTex = await Assets.load('./assets/map.png');
+  const base = new Sprite(baseTex);
+  base.width = WORLD.w;
+  base.height = WORLD.h;
+  world.addChild(base);
+
+  // 高清瓦片层：按视野动态加载/卸载（slippy-map）
+  const tileLayer = new Container();
+  world.addChild(tileLayer);
+  const tiles = new Map(); // key "tx_ty" -> Sprite | null(加载中)
+  function updateTiles() {
+    const visW = window.innerWidth / zoom, visH = window.innerHeight / zoom;
+    const x0 = Math.max(0, Math.floor(camera.x / T) - 1);
+    const x1 = Math.min(meta.cols - 1, Math.ceil((camera.x + visW) / T));
+    const y0 = Math.max(0, Math.floor(camera.y / T) - 1);
+    const y1 = Math.min(meta.rows - 1, Math.ceil((camera.y + visH) / T));
+    const need = new Set();
+    for (let ty = y0; ty <= y1; ty++) for (let tx = x0; tx <= x1; tx++) {
+      const key = tx + '_' + ty;
+      need.add(key);
+      if (!tiles.has(key)) {
+        tiles.set(key, null); // 标记加载中
+        const px = tx * T, py = ty * T;
+        Assets.load(`./assets/tiles/${key}.webp`).then((tex) => {
+          if (!tiles.has(key)) return;      // 加载完成前已移出视野
+          const sp = new Sprite(tex);
+          sp.x = px; sp.y = py;
+          tileLayer.addChild(sp);
+          tiles.set(key, sp);
+        }).catch(() => tiles.delete(key));
+      }
+    }
+    for (const [key, sp] of tiles) {
+      if (!need.has(key)) {
+        if (sp) { tileLayer.removeChild(sp); sp.destroy(); }
+        tiles.delete(key);
+      }
+    }
+  }
 
   player.x = WORLD.w / 2;
   player.y = WORLD.h * 0.6;
   const playerSprite = makePlayer();
+  playerSprite.scale.set(2.4); // 大世界下放大小人，保证可见可控（比例不变）
   world.addChild(playerSprite);
 
   // 加载热点
@@ -123,11 +167,13 @@ async function main() {
     world.scale.set(zoom);
     world.position.set(-cam.x * zoom, -cam.y * zoom);
 
+    updateTiles();
+
     const near = nearestPoi(player.x, player.y, pois, HILITE_RADIUS);
     highlight.clear();
     if (near) {
       highlight.rect(near.x, near.y, near.w, near.h)
-        .stroke({ width: 3, color: 0xf0c869, alpha: 0.9 });
+        .stroke({ width: 8, color: 0xf0c869, alpha: 0.9 });
     }
   });
 }
