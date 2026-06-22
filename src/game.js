@@ -71,6 +71,7 @@ async function main() {
   let joyId = null;
   const R = 35; // 摇杆半径
   function joyStart(e) {
+    if (joyId !== null) return; // 已有手指控制摇杆时，忽略第二根手指（避免劫持）
     joyId = e.changedTouches[0].identifier; joyMove(e);
   }
   function joyMove(e) {
@@ -91,6 +92,7 @@ async function main() {
   joy.addEventListener('touchstart', joyStart, { passive: false });
   joy.addEventListener('touchmove', joyMove, { passive: false });
   joy.addEventListener('touchend', joyEnd);
+  joy.addEventListener('touchcancel', joyEnd); // 触摸被系统取消时复位，避免卡住移动
 
   window.addEventListener('keydown', (e) => {
     const k = e.key.toLowerCase();
