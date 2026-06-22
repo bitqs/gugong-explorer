@@ -7,19 +7,30 @@ const WORLD = { w: 0, h: 0 };
 const player = { x: 0, y: 0 };
 const camera = { x: 0, y: 0 };
 const zoom = 0.78;        // 全分辨率世界下的屏幕放大倍数（≈ 旧 1843px 世界的 3.0 视感）
-const SPEED = 1400;       // 世界像素/秒（随大世界等比放大）
+const SPEED = 820;        // 世界像素/秒（小太监步速，放慢一些更从容）
 const keys = new Set();
 
-function makePlayer() {
-  // 平涂手绘风小人：瘦长身形、头身比约 1:5，贴近真人比例
-  const g = new Graphics();
-  g.ellipse(0, 1, 6, 2.2).fill({ color: 0x000000, alpha: 0.22 });      // 影子
-  g.moveTo(-5.5, 0).lineTo(5.5, 0).lineTo(2.4, -19).lineTo(-2.4, -19).closePath().fill(0xb22222); // 长袍（A字下摆）
-  g.moveTo(-2.4, -19).lineTo(2.4, -19).lineTo(1.6, -21).lineTo(-1.6, -21).closePath().fill(0xf0d2a8); // 脖颈/领口
-  g.circle(0, -23.5, 3).fill(0xf0d2a8);                                // 头
-  g.ellipse(0, -26, 4, 1.6).fill(0x2f2f3a);                            // 官帽（扁平帽檐，坐头顶不遮脸）
-  g.circle(0, -27.8, 1).fill(0xc0392b);                                // 帽顶珠
-  return g;
+// 小太监（PixelLab 生成）：8 向旋转贴图 + 4 主方向跑动动画
+const TJ = 'assets/taijian/7ef8ce46';
+const CARDS = ['east', 'south', 'west', 'north'];
+const DIRS = ['south', 'south-east', 'east', 'north-east', 'north', 'north-west', 'west', 'south-west'];
+
+function dir8(dx, dy) {
+  const deg = (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
+  return ['east', 'south-east', 'south', 'south-west', 'west', 'north-west', 'north', 'north-east'][Math.round(deg / 45) % 8];
+}
+
+async function loadTaijian() {
+  const rot = {}, run = {};
+  await Promise.all([
+    ...DIRS.map(async (d) => { rot[d] = await Assets.load(`${TJ}/rotations/${d}.png`); }),
+    ...CARDS.map(async (c) => {
+      run[c] = await Promise.all([0, 1, 2, 3].map((i) => Assets.load(`${TJ}/animations/Running/${c}/frame_00${i}.png`)));
+    }),
+  ]);
+  // 像素风：放大保持硬边，不做模糊
+  for (const t of [...Object.values(rot), ...Object.values(run).flat()]) t.source.scaleMode = 'nearest';
+  return { rot, run };
 }
 
 async function main() {
@@ -81,8 +92,12 @@ async function main() {
 
   player.x = WORLD.w / 2;
   player.y = WORLD.h * 0.6;
-  const playerSprite = makePlayer();
-  playerSprite.scale.set(2.4); // 大世界下放大小人，保证可见可控（比例不变）
+  const tj = await loadTaijian();
+  let facing = 'south';
+  let animT = 0;
+  const playerSprite = new Sprite(tj.rot.south);
+  playerSprite.anchor.set(0.5, 0.82); // 锚点在脚附近
+  playerSprite.scale.set(1.5);
   world.addChild(playerSprite);
 
   // 加载热点
@@ -159,6 +174,16 @@ async function main() {
       const len = Math.hypot(dx, dy);
       player.x = Math.max(0, Math.min(WORLD.w, player.x + (dx / len) * SPEED * dt));
       player.y = Math.max(0, Math.min(WORLD.h, player.y + (dy / len) * SPEED * dt));
+      facing = dir8(dx, dy);
+      if (tj.run[facing]) {                 // 主方向：播放跑动动画
+        animT += dt;
+        playerSprite.texture = tj.run[facing][Math.floor(animT * 9) % 4];
+      } else {                              // 斜向：用对应八向静帧
+        playerSprite.texture = tj.rot[facing];
+      }
+    } else {
+      animT = 0;
+      playerSprite.texture = tj.rot[facing]; // 站立：朝当前方向
     }
     playerSprite.position.set(player.x, player.y);
 

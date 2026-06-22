@@ -1,0 +1,92 @@
+{
+  "group_id": "887a8161-9e15-4355-a84b-8fa8d3b4ab19",
+  "states": [
+    {
+      "character": {
+        "id": "4a57fff0-a1d8-4ab2-9ea6-0d60bcf6bd74",
+        "name": "\u4e00\u4e2a\u5c0f\u592a\u76d1 \u7528\u4e8e\u6545\u5bab\u6e38\u620f",
+        "prompt": "\u4e00\u4e2a\u5c0f\u592a\u76d1 \u7528\u4e8e\u6545\u5bab\u6e38\u620f",
+        "size": {
+          "width": 88,
+          "height": 88
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-06-22T08:21:42.676897+00:00"
+      },
+      "folder": "4a57fff0",
+      "frames": {
+        "rotations": {
+          "south": "4a57fff0/rotations/south.png",
+          "south-east": "4a57fff0/rotations/south-east.png",
+          "east": "4a57fff0/rotations/east.png",
+          "north-east": "4a57fff0/rotations/north-east.png",
+          "north": "4a57fff0/rotations/north.png",
+          "north-west": "4a57fff0/rotations/north-west.png",
+          "west": "4a57fff0/rotations/west.png",
+          "south-west": "4a57fff0/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    },
+    {
+      "character": {
+        "id": "7ef8ce46-98e2-418a-a05c-f1e2f9b27fde",
+        "name": "\u7ea2\u888d \u9ed1\u9876\u5e3d",
+        "prompt": "\u4e00\u4e2a\u5c0f\u592a\u76d1 \u7528\u4e8e\u6545\u5bab\u6e38\u620f",
+        "size": {
+          "width": 88,
+          "height": 88
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-06-22T08:28:07.299033+00:00"
+      },
+      "folder": "7ef8ce46",
+      "frames": {
+        "rotations": {
+          "south": "7ef8ce46/rotations/south.png",
+          "south-east": "7ef8ce46/rotations/south-east.png",
+          "east": "7ef8ce46/rotations/east.png",
+          "north-east": "7ef8ce46/rotations/north-east.png",
+          "north": "7ef8ce46/rotations/north.png",
+          "north-west": "7ef8ce46/rotations/north-west.png",
+          "west": "7ef8ce46/rotations/west.png",
+          "south-west": "7ef8ce46/rotations/south-west.png"
+        },
+        "animations": {
+          "Running": {
+            "north": [
+              "7ef8ce46/animations/Running/north/frame_000.png",
+              "7ef8ce46/animations/Running/north/frame_001.png",
+              "7ef8ce46/animations/Running/north/frame_002.png",
+              "7ef8ce46/animations/Running/north/frame_003.png"
+            ],
+            "west": [
+              "7ef8ce46/animations/Running/west/frame_000.png",
+              "7ef8ce46/animations/Running/west/frame_001.png",
+              "7ef8ce46/animations/Running/west/frame_002.png",
+              "7ef8ce46/animations/Running/west/frame_003.png"
+            ],
+            "east": [
+              "7ef8ce46/animations/Running/east/frame_000.png",
+              "7ef8ce46/animations/Running/east/frame_001.png",
+              "7ef8ce46/animations/Running/east/frame_002.png",
+              "7ef8ce46/animations/Running/east/frame_003.png"
+            ],
+            "south": [
+              "7ef8ce46/animations/Running/south/frame_000.png",
+              "7ef8ce46/animations/Running/south/frame_001.png",
+              "7ef8ce46/animations/Running/south/frame_002.png",
+              "7ef8ce46/animations/Running/south/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-06-22T08:55:23.694367"
+}
