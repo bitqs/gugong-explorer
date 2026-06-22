@@ -56,6 +56,22 @@ async function main() {
   base.height = WORLD.h;
   world.addChild(base);
 
+  // 可走遮罩：低清灰度图，白=可走（庭院/铺地），黑=挡（建筑/墙/水）
+  const maskImg = new Image();
+  maskImg.src = './assets/walkmask.png';
+  await maskImg.decode();
+  const mc = document.createElement('canvas');
+  mc.width = maskImg.width; mc.height = maskImg.height;
+  const mctx = mc.getContext('2d', { willReadFrequently: true });
+  mctx.drawImage(maskImg, 0, 0);
+  const mdata = mctx.getImageData(0, 0, mc.width, mc.height).data;
+  const maskW = mc.width, maskH = mc.height;
+  function walkable(wx, wy) {
+    const mx = Math.min(maskW - 1, Math.max(0, Math.floor(wx / WORLD.w * maskW)));
+    const my = Math.min(maskH - 1, Math.max(0, Math.floor(wy / WORLD.h * maskH)));
+    return mdata[(my * maskW + mx) * 4] > 128;
+  }
+
   // 高清瓦片层：按视野动态加载/卸载（slippy-map）
   const tileLayer = new Container();
   world.addChild(tileLayer);
@@ -91,7 +107,7 @@ async function main() {
   }
 
   player.x = WORLD.w / 2;
-  player.y = WORLD.h * 0.6;
+  player.y = WORLD.h * 0.52;  // 太和殿前大广场，开阔可走
   const tj = await loadTaijian();
   let facing = 'south';
   let animT = 0;
@@ -172,8 +188,12 @@ async function main() {
     if (keys.has('arrowdown') || keys.has('s')) dy += 1;
     if (dx || dy) {
       const len = Math.hypot(dx, dy);
-      player.x = Math.max(0, Math.min(WORLD.w, player.x + (dx / len) * SPEED * dt));
-      player.y = Math.max(0, Math.min(WORLD.h, player.y + (dy / len) * SPEED * dt));
+      const nx = Math.max(0, Math.min(WORLD.w, player.x + (dx / len) * SPEED * dt));
+      const ny = Math.max(0, Math.min(WORLD.h, player.y + (dy / len) * SPEED * dt));
+      // 碰撞 + 贴墙滑行：整体不可走时，尝试只走 X 或只走 Y
+      if (walkable(nx, ny)) { player.x = nx; player.y = ny; }
+      else if (walkable(nx, player.y)) { player.x = nx; }
+      else if (walkable(player.x, ny)) { player.y = ny; }
       facing = dir8(dx, dy);
       if (tj.run[facing]) {                 // 主方向：播放跑动动画
         animT += dt;
