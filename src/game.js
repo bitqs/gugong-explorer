@@ -6,7 +6,7 @@ const input = { x: 0, y: 0 };
 const WORLD = { w: 0, h: 0 };
 const player = { x: 0, y: 0 };
 const camera = { x: 0, y: 0 };
-const zoom = 2.0;
+const zoom = 2.7;
 const SPEED = 280; // 世界像素/秒
 const keys = new Set();
 
