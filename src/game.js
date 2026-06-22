@@ -1,4 +1,4 @@
-import { Application, Assets, Container, Sprite } from 'https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.mjs';
+import { Application, Assets, Container, Sprite } from 'https://cdn.jsdelivr.net/npm/pixi.js@8.19.0/dist/pixi.min.mjs';
 
 const WORLD = { w: 0, h: 0 };
 
