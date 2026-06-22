@@ -41,7 +41,9 @@ async function main() {
   world.addChild(playerSprite);
 
   // 加载热点
-  const rawPois = await fetch('./assets/pois.json').then((r) => r.json());
+  const res = await fetch('./assets/pois.json');
+  if (!res.ok) throw new Error('pois.json ' + res.status);
+  const rawPois = await res.json();
   const pois = denormalizePois(rawPois, WORLD.w, WORLD.h);
   const HILITE_RADIUS = WORLD.h * 0.06;
 
@@ -129,6 +131,11 @@ async function main() {
   });
 }
 
-main();
+main().catch((err) => {
+  console.error(err);
+  const el = document.getElementById('error');
+  el.textContent = '加载失败：地图或数据未能载入。请确认通过 http 服务打开（而非直接双击文件），并重试。';
+  el.style.display = 'flex';
+});
 
 export { WORLD, player, camera, zoom };
