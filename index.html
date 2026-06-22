@@ -17,11 +17,18 @@
     #poi-card p { margin: 0; }
     #poi-close { position: absolute; top: 8px; right: 12px; background: none; border: none;
       color: #f5e6c8; font-size: 22px; cursor: pointer; line-height: 1; }
+    #joy { position: fixed; left: 24px; bottom: 24px; width: 120px; height: 120px;
+      border-radius: 50%; background: rgba(245,230,200,.12); border: 1px solid rgba(245,230,200,.3);
+      touch-action: none; display: none; }
+    #joy-knob { position: absolute; left: 35px; top: 35px; width: 50px; height: 50px;
+      border-radius: 50%; background: rgba(240,200,105,.7); }
+    @media (pointer: coarse) { #joy { display: block; } }
   </style>
 </head>
 <body>
   <div id="app"></div>
   <div id="error"></div>
+  <div id="joy"><div id="joy-knob"></div></div>
   <div id="poi-card" style="display:none">
     <button id="poi-close" aria-label="关闭">×</button>
     <h2 id="poi-name"></h2>

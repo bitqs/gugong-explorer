@@ -2,6 +2,7 @@ import { Application, Assets, Container, Sprite, Graphics } from 'https://cdn.js
 import { clampCamera } from './camera.js';
 import { denormalizePois, nearestPoi, pointInPoi } from './poi-logic.js';
 
+const input = { x: 0, y: 0 };
 const WORLD = { w: 0, h: 0 };
 const player = { x: 0, y: 0 };
 const camera = { x: 0, y: 0 };
@@ -65,6 +66,32 @@ async function main() {
     if (hit) showCard(hit);
   });
 
+  const joy = document.getElementById('joy');
+  const knob = document.getElementById('joy-knob');
+  let joyId = null;
+  const R = 35; // 摇杆半径
+  function joyStart(e) {
+    joyId = e.changedTouches[0].identifier; joyMove(e);
+  }
+  function joyMove(e) {
+    for (const t of e.changedTouches) {
+      if (t.identifier !== joyId) continue;
+      const r = joy.getBoundingClientRect();
+      let dx = t.clientX - (r.left + r.width / 2);
+      let dy = t.clientY - (r.top + r.height / 2);
+      const len = Math.hypot(dx, dy) || 1;
+      const cl = Math.min(len, R);
+      input.x = (dx / len); input.y = (dy / len);
+      knob.style.left = `${35 + (dx / len) * cl}px`;
+      knob.style.top = `${35 + (dy / len) * cl}px`;
+    }
+    e.preventDefault();
+  }
+  function joyEnd() { joyId = null; input.x = 0; input.y = 0; knob.style.left = '35px'; knob.style.top = '35px'; }
+  joy.addEventListener('touchstart', joyStart, { passive: false });
+  joy.addEventListener('touchmove', joyMove, { passive: false });
+  joy.addEventListener('touchend', joyEnd);
+
   window.addEventListener('keydown', (e) => {
     const k = e.key.toLowerCase();
     if (['arrowleft', 'arrowright', 'arrowup', 'arrowdown'].includes(k)) e.preventDefault();
@@ -74,7 +101,7 @@ async function main() {
 
   app.ticker.add((ticker) => {
     const dt = ticker.deltaMS / 1000;
-    let dx = 0, dy = 0;
+    let dx = input.x, dy = input.y;
     if (keys.has('arrowleft') || keys.has('a')) dx -= 1;
     if (keys.has('arrowright') || keys.has('d')) dx += 1;
     if (keys.has('arrowup') || keys.has('w')) dy -= 1;
