@@ -6,18 +6,19 @@ const input = { x: 0, y: 0 };
 const WORLD = { w: 0, h: 0 };
 const player = { x: 0, y: 0 };
 const camera = { x: 0, y: 0 };
-const zoom = 1.4;
+const zoom = 2.0;
 const SPEED = 280; // 世界像素/秒
 const keys = new Set();
 
 function makePlayer() {
-  // 平涂手绘风小人：青灰底座 + 朱红长袍 + 肤色头
+  // 平涂手绘风小人：瘦长身形、头身比约 1:5，贴近真人比例
   const g = new Graphics();
-  g.ellipse(0, 2, 12, 5).fill({ color: 0x000000, alpha: 0.25 });      // 影子
-  g.moveTo(-9, 0).lineTo(9, 0).lineTo(6, -22).lineTo(-6, -22).closePath().fill(0xb22222); // 长袍
-  g.circle(0, -28, 7).fill(0xf0d2a8);                                  // 头
-  g.ellipse(0, -34, 9, 4).fill(0x2f2f3a);                              // 官帽（扁平帽檐，坐在头顶不遮脸）
-  g.circle(0, -38, 2).fill(0xc0392b);                                  // 帽顶珠
+  g.ellipse(0, 1, 6, 2.2).fill({ color: 0x000000, alpha: 0.22 });      // 影子
+  g.moveTo(-5.5, 0).lineTo(5.5, 0).lineTo(2.4, -19).lineTo(-2.4, -19).closePath().fill(0xb22222); // 长袍（A字下摆）
+  g.moveTo(-2.4, -19).lineTo(2.4, -19).lineTo(1.6, -21).lineTo(-1.6, -21).closePath().fill(0xf0d2a8); // 脖颈/领口
+  g.circle(0, -23.5, 3).fill(0xf0d2a8);                                // 头
+  g.ellipse(0, -26, 4, 1.6).fill(0x2f2f3a);                            // 官帽（扁平帽檐，坐头顶不遮脸）
+  g.circle(0, -27.8, 1).fill(0xc0392b);                                // 帽顶珠
   return g;
 }
 
