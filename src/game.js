@@ -14,7 +14,8 @@ function makePlayer() {
   g.ellipse(0, 2, 12, 5).fill({ color: 0x000000, alpha: 0.25 });      // 影子
   g.moveTo(-9, 0).lineTo(9, 0).lineTo(6, -22).lineTo(-6, -22).closePath().fill(0xb22222); // 长袍
   g.circle(0, -28, 7).fill(0xf0d2a8);                                  // 头
-  g.circle(0, -33, 8).fill(0x2f2f3a);                                  // 帽
+  g.ellipse(0, -34, 9, 4).fill(0x2f2f3a);                              // 官帽（扁平帽檐，坐在头顶不遮脸）
+  g.circle(0, -38, 2).fill(0xc0392b);                                  // 帽顶珠
   return g;
 }
 
@@ -37,7 +38,11 @@ async function main() {
   const playerSprite = makePlayer();
   world.addChild(playerSprite);
 
-  window.addEventListener('keydown', (e) => keys.add(e.key.toLowerCase()));
+  window.addEventListener('keydown', (e) => {
+    const k = e.key.toLowerCase();
+    if (['arrowleft', 'arrowright', 'arrowup', 'arrowdown'].includes(k)) e.preventDefault();
+    keys.add(k);
+  });
   window.addEventListener('keyup', (e) => keys.delete(e.key.toLowerCase()));
 
   app.ticker.add((ticker) => {
