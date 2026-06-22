@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>故宫漫游</title>
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #1a1410; }
+    #app canvas { display: block; }
+    #error { position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
+             color: #f5e6c8; font: 16px/1.6 system-ui, sans-serif; padding: 24px; text-align: center; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <div id="error"></div>
+  <script type="module" src="./src/game.js"></script>
+</body>
+</html>
