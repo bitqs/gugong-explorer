@@ -9,11 +9,24 @@
     #app canvas { display: block; }
     #error { position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
              color: #f5e6c8; font: 16px/1.6 system-ui, sans-serif; padding: 24px; text-align: center; }
+    #poi-card { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+      width: min(520px, calc(100% - 32px)); background: rgba(28,20,16,.94); color: #f5e6c8;
+      border: 1px solid #8a6a3a; border-radius: 12px; padding: 16px 20px;
+      font: 15px/1.7 system-ui, sans-serif; box-shadow: 0 8px 32px rgba(0,0,0,.5); }
+    #poi-card h2 { margin: 0 0 6px; font-size: 20px; color: #f0c869; }
+    #poi-card p { margin: 0; }
+    #poi-close { position: absolute; top: 8px; right: 12px; background: none; border: none;
+      color: #f5e6c8; font-size: 22px; cursor: pointer; line-height: 1; }
   </style>
 </head>
 <body>
   <div id="app"></div>
   <div id="error"></div>
+  <div id="poi-card" style="display:none">
+    <button id="poi-close" aria-label="关闭">×</button>
+    <h2 id="poi-name"></h2>
+    <p id="poi-intro"></p>
+  </div>
   <script type="module" src="./src/game.js"></script>
 </body>
 </html>

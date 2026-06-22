@@ -1,5 +1,6 @@
 import { Application, Assets, Container, Sprite, Graphics } from 'https://cdn.jsdelivr.net/npm/pixi.js@8.19.0/dist/pixi.min.mjs';
 import { clampCamera } from './camera.js';
+import { denormalizePois, nearestPoi, pointInPoi } from './poi-logic.js';
 
 const WORLD = { w: 0, h: 0 };
 const player = { x: 0, y: 0 };
@@ -38,6 +39,32 @@ async function main() {
   const playerSprite = makePlayer();
   world.addChild(playerSprite);
 
+  // 加载热点
+  const rawPois = await fetch('./assets/pois.json').then((r) => r.json());
+  const pois = denormalizePois(rawPois, WORLD.w, WORLD.h);
+  const HILITE_RADIUS = WORLD.h * 0.06;
+
+  const highlight = new Graphics();
+  world.addChild(highlight);
+
+  function showCard(p) {
+    document.getElementById('poi-name').textContent = p.name;
+    document.getElementById('poi-intro').textContent = p.intro;
+    document.getElementById('poi-card').style.display = 'block';
+  }
+  document.getElementById('poi-close').onclick = () => {
+    document.getElementById('poi-card').style.display = 'none';
+  };
+
+  // 点击/触摸：换算世界坐标，命中矩形则弹卡
+  app.stage.eventMode = 'static';
+  app.stage.hitArea = app.screen;
+  app.stage.on('pointertap', (e) => {
+    const wp = world.toLocal(e.global);
+    const hit = pois.find((p) => pointInPoi(wp.x, wp.y, p));
+    if (hit) showCard(hit);
+  });
+
   window.addEventListener('keydown', (e) => {
     const k = e.key.toLowerCase();
     if (['arrowleft', 'arrowright', 'arrowup', 'arrowdown'].includes(k)) e.preventDefault();
@@ -63,6 +90,13 @@ async function main() {
     camera.x = cam.x; camera.y = cam.y;
     world.scale.set(zoom);
     world.position.set(-cam.x * zoom, -cam.y * zoom);
+
+    const near = nearestPoi(player.x, player.y, pois, HILITE_RADIUS);
+    highlight.clear();
+    if (near) {
+      highlight.rect(near.x, near.y, near.w, near.h)
+        .stroke({ width: 3, color: 0xf0c869, alpha: 0.9 });
+    }
   });
 }
 
